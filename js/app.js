@@ -30,11 +30,9 @@ function initAudio(){
   ctx = new (window.AudioContext||window.webkitAudioContext)();
   master = ctx.createGain(); master.gain.value = 0.9;
 
-  // Master bus feeds speakers AND Master Rec
   recordDest.master = ctx.createMediaStreamDestination();
   master.connect(recordDest.master);
 
-  // Stem buses feed FX/Master AND their respective Stem Recs
   const busSyn1 = ctx.createGain(); busSyn1.gain.value = 1;
   recordDest.syn1 = ctx.createMediaStreamDestination(); busSyn1.connect(recordDest.syn1);
   window.__busSyn1 = busSyn1;
@@ -91,8 +89,6 @@ function initAudio(){
       songMode = true;
       activeSongPattern = songChain[0];
       startSeq();
-      document.getElementById('song-play').textContent = '■ STOP';
-      document.getElementById('song-play').classList.add('on');
   }
 }
 
@@ -104,7 +100,6 @@ function buildSynth(name){
   const vca = ctx.createGain(); vca.gain.value = 0;
   const level = ctx.createGain(); level.gain.value = params[name].level;
 
-  // Route to specific stem bus
   vco.connect(vcf); vcf.connect(vca); vca.connect(level); 
   level.connect(name === 'syn1' ? window.__busSyn1 : window.__busSyn2);
   vco.start();
@@ -390,12 +385,9 @@ document.getElementById('lfo-wave').addEventListener('change', e=>{ if(initializ
 /* ============ SEQUENCER & DEMO PATTERNS ============ */
 const tracks = ['syn1','syn2','kick','snare','hihat','tom'];
 const trackLabel = {syn1:'SYN1', syn2:'SYN2', kick:'KICK', snare:'SNARE', hihat:'HI-HAT', tom:'TOM'};
-
-// Initialize Empty Pattern Structure
 let pattern = {A:{}, B:{}};
 ['A','B'].forEach(p=> tracks.forEach(t=> pattern[p][t] = Array.from({length:16}, ()=>({on:false, note:0})) ));
 
-// --- PRE-LOAD TECHNO POP DEMO ---
 function mapDemoTrack(patt, track, arr, notesArr) {
     for(let i=0; i<16; i++) {
         pattern[patt][track][i].on = arr[i] === 1;
@@ -403,26 +395,23 @@ function mapDemoTrack(patt, track, arr, notesArr) {
     }
 }
 
-// Pattern A (Groove)
+// Demo Pattern A (Groove)
 mapDemoTrack('A', 'kick',  [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0]);
 mapDemoTrack('A', 'snare', [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0]);
 mapDemoTrack('A', 'hihat', [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0]);
 mapDemoTrack('A', 'syn1',  [1,0,1,1, 0,1,0,1, 1,0,1,0, 0,1,0,0], [-12,0,-12,-12, 0,-5,0,-3, -12,0,-12,0, 0,-5,0,0]);
 mapDemoTrack('A', 'syn2',  [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], [0,0,12,0, 0,0,7,0, 0,0,12,0, 0,0,7,0]);
 
-// Pattern B (Build/Roll)
+// Demo Pattern B (Build)
 mapDemoTrack('B', 'kick',  [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0]);
 mapDemoTrack('B', 'snare', [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,1,1,1]);
 mapDemoTrack('B', 'hihat', [0,0,1,0, 0,0,1,0, 0,0,1,0, 1,1,1,1]);
 mapDemoTrack('B', 'syn1',  [1,0,1,1, 0,1,0,1, 1,0,1,0, 0,1,0,0], [-12,0,-12,-12, 0,-5,0,-3, -12,0,-12,0, 0,-5,0,0]);
 mapDemoTrack('B', 'syn2',  [0,0,1,0, 1,0,1,0, 0,0,1,0, 1,1,1,1], [0,0,12,0, 12,0,7,0, 0,0,12,0, 12,12,12,12]);
 
-let songChain = ['A', 'A', 'A', 'B']; // Pre-load Song
-// --------------------------------
-
 let curTrack = 'syn1', curPattern = 'A';
 let playing=false, curStep=0, nextStepTime=0, timerId=null, activeSongPattern=null;
-let songIndex = 0, songMode=false;
+let songChain = ['A', 'A', 'A', 'B'], songIndex = 0, songMode=false;
 const seqTracksHost = document.getElementById('seq-tracks');
 
 tracks.forEach(t=>{
@@ -658,7 +647,7 @@ if (typeof MediaRecorder === 'undefined') {
   recordStatus.innerText = 'NO SUPPORT';
 } else {
   recordBtn.addEventListener('click', async () => {
-    if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
+    if (ctx && ctx.state === 'suspended') await ctx.resume();
 
     if (!isRecording) {
       STEMS.forEach(key => {

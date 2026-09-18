@@ -27,68 +27,88 @@ function curve(min,max,n){ return min + (max-min)*n; }
 
 function initAudio(){
   if(initialized) return;
-  ctx = new (window.AudioContext||window.webkitAudioContext)();
-  master = ctx.createGain(); master.gain.value = 0.9;
-
-  recordDest.master = ctx.createMediaStreamDestination();
-  master.connect(recordDest.master);
-
-  const busSyn1 = ctx.createGain(); busSyn1.gain.value = 1;
-  recordDest.syn1 = ctx.createMediaStreamDestination(); busSyn1.connect(recordDest.syn1);
-  window.__busSyn1 = busSyn1;
-
-  const busSyn2 = ctx.createGain(); busSyn2.gain.value = 1;
-  recordDest.syn2 = ctx.createMediaStreamDestination(); busSyn2.connect(recordDest.syn2);
-  window.__busSyn2 = busSyn2;
-
-  const busDrum = ctx.createGain(); busDrum.gain.value = 1;
-  recordDest.drum = ctx.createMediaStreamDestination(); busDrum.connect(recordDest.drum);
-  window.__busDrum = busDrum;
-
-  const fxIn = ctx.createGain();
-  busSyn1.connect(fxIn);
-  busSyn2.connect(fxIn);
-  busDrum.connect(fxIn);
-
-  chorusDry = ctx.createGain(); chorusWet = ctx.createGain();
-  const chorusDelay = ctx.createDelay(0.05); chorusDelay.delayTime.value = 0.012;
-  chorusLfo = ctx.createOscillator(); chorusLfo.type='sine'; chorusLfo.frequency.value = params.chorusRate;
-  chorusLfoGain = ctx.createGain(); chorusLfoGain.gain.value = 0.004 * params.chorusDepth;
-  chorusLfo.connect(chorusLfoGain); chorusLfoGain.connect(chorusDelay.delayTime); chorusLfo.start();
-  fxIn.connect(chorusDry);
-  fxIn.connect(chorusDelay); chorusDelay.connect(chorusWet);
-  chorusDry.gain.value = 1; chorusWet.gain.value = 0;
-
-  const chorusOut = ctx.createGain();
-  chorusDry.connect(chorusOut); chorusWet.connect(chorusOut);
-
-  delayNode = ctx.createDelay(1.0); delayNode.delayTime.value = params.delayTime;
-  delayFb = ctx.createGain(); delayFb.gain.value = params.delayFb;
-  delayWet = ctx.createGain(); delayWet.gain.value = 0;
-  delayDry = ctx.createGain(); delayDry.gain.value = 1;
-  chorusOut.connect(delayDry);
-  chorusOut.connect(delayNode); delayNode.connect(delayFb); delayFb.connect(delayNode);
-  delayNode.connect(delayWet);
-  delayDry.connect(master); delayWet.connect(master);
-  master.connect(ctx.destination);
-
-  window.__fxIn = fxIn; 
-
-  lfo = ctx.createOscillator(); lfo.type='sine'; lfo.frequency.value = params.lfoRate;
-  lfoGain = ctx.createGain(); lfoGain.gain.value = 1;
-  lfo.connect(lfoGain); lfo.start();
-
-  synths.syn1 = buildSynth('syn1');
-  synths.syn2 = buildSynth('syn2');
-
-  initialized = true;
-  document.getElementById('start-overlay').style.display='none';
   
-  // Auto-play demo
-  if(!playing) {
-      songMode = true;
-      activeSongPattern = songChain[0];
-      startSeq();
+  try {
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value = 0.9;
+
+    // Feature detect MediaStreamDestination for Safari/iOS compatibility
+    const supportsRecording = !!ctx.createMediaStreamDestination;
+
+    if (supportsRecording) {
+      recordDest.master = ctx.createMediaStreamDestination();
+      master.connect(recordDest.master);
+    }
+
+    const busSyn1 = ctx.createGain(); busSyn1.gain.value = 1;
+    if (supportsRecording) {
+      recordDest.syn1 = ctx.createMediaStreamDestination(); 
+      busSyn1.connect(recordDest.syn1);
+    }
+    window.__busSyn1 = busSyn1;
+
+    const busSyn2 = ctx.createGain(); busSyn2.gain.value = 1;
+    if (supportsRecording) {
+      recordDest.syn2 = ctx.createMediaStreamDestination(); 
+      busSyn2.connect(recordDest.syn2);
+    }
+    window.__busSyn2 = busSyn2;
+
+    const busDrum = ctx.createGain(); busDrum.gain.value = 1;
+    if (supportsRecording) {
+      recordDest.drum = ctx.createMediaStreamDestination(); 
+      busDrum.connect(recordDest.drum);
+    }
+    window.__busDrum = busDrum;
+
+    const fxIn = ctx.createGain();
+    busSyn1.connect(fxIn);
+    busSyn2.connect(fxIn);
+    busDrum.connect(fxIn);
+
+    chorusDry = ctx.createGain(); chorusWet = ctx.createGain();
+    const chorusDelay = ctx.createDelay(0.05); chorusDelay.delayTime.value = 0.012;
+    chorusLfo = ctx.createOscillator(); chorusLfo.type='sine'; chorusLfo.frequency.value = params.chorusRate;
+    chorusLfoGain = ctx.createGain(); chorusLfoGain.gain.value = 0.004 * params.chorusDepth;
+    chorusLfo.connect(chorusLfoGain); chorusLfoGain.connect(chorusDelay.delayTime); chorusLfo.start();
+    fxIn.connect(chorusDry);
+    fxIn.connect(chorusDelay); chorusDelay.connect(chorusWet);
+    chorusDry.gain.value = 1; chorusWet.gain.value = 0;
+
+    const chorusOut = ctx.createGain();
+    chorusDry.connect(chorusOut); chorusWet.connect(chorusOut);
+
+    delayNode = ctx.createDelay(1.0); delayNode.delayTime.value = params.delayTime;
+    delayFb = ctx.createGain(); delayFb.gain.value = params.delayFb;
+    delayWet = ctx.createGain(); delayWet.gain.value = 0;
+    delayDry = ctx.createGain(); delayDry.gain.value = 1;
+    chorusOut.connect(delayDry);
+    chorusOut.connect(delayNode); delayNode.connect(delayFb); delayFb.connect(delayNode);
+    delayNode.connect(delayWet);
+    delayDry.connect(master); delayWet.connect(master);
+    master.connect(ctx.destination);
+
+    window.__fxIn = fxIn; 
+
+    lfo = ctx.createOscillator(); lfo.type='sine'; lfo.frequency.value = params.lfoRate;
+    lfoGain = ctx.createGain(); lfoGain.gain.value = 1;
+    lfo.connect(lfoGain); lfo.start();
+
+    synths.syn1 = buildSynth('syn1');
+    synths.syn2 = buildSynth('syn2');
+
+    initialized = true;
+    document.getElementById('start-overlay').style.display='none';
+    
+    // Auto-play demo sequence
+    if(!playing) {
+        songMode = true;
+        activeSongPattern = songChain[0];
+        startSeq();
+    }
+  } catch (err) {
+    console.error("Audio Context Init Failed:", err);
+    alert("Audio Engine Failed to Start. Ensure you are using a modern browser like Chrome or Edge.");
   }
 }
 
@@ -641,7 +661,10 @@ const recordStatus = document.getElementById('recordStatus');
 const downloadEls = {};
 STEMS.forEach(key => downloadEls[key] = document.getElementById(`dl-${key}`));
 
-if (typeof MediaRecorder === 'undefined') {
+const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+const supportsMediaRecorder = typeof MediaRecorder !== 'undefined' && AudioCtxClass && !!AudioCtxClass.prototype.createMediaStreamDestination;
+
+if (!supportsMediaRecorder) {
   recordBtn.classList.add('btn-disabled');
   recordBtn.innerText = 'REC N/A';
   recordStatus.innerText = 'NO SUPPORT';
@@ -780,4 +803,3 @@ function flashMsg(msg){
 }
 
 renderSong();
-</script>

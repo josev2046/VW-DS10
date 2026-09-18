@@ -166,11 +166,26 @@
           </div>
           <div class="ctrl"><label>NOTE (NEW STEPS)</label>
             <select class="dsel" id="seq-note">
-              <option value="-12">C3</option><option value="-10">D3</option><option value="-8">E3</option>
-              <option value="-5">G3</option><option value="-3">A3</option>
-              <option value="0" selected>C4</option><option value="2">D4</option><option value="4">E4</option>
-              <option value="5">F4</option><option value="7">G4</option><option value="9">A4</option><option value="11">B4</option>
-              <option value="12">C5</option>
+              <!-- Octave 3 -->
+              <option value="-12">C3</option><option value="-11">C#3</option>
+              <option value="-10">D3</option><option value="-9">D#3</option>
+              <option value="-8">E3</option><option value="-7">F3</option>
+              <option value="-6">F#3</option><option value="-5">G3</option>
+              <option value="-4">G#3</option><option value="-3">A3</option>
+              <option value="-2">A#3</option><option value="-1">B3</option>
+              
+              <!-- Octave 4 -->
+              <option value="0" selected>C4</option><option value="1">C#4</option>
+              <option value="2">D4</option><option value="3">D#4</option>
+              <option value="4">E4</option><option value="5">F4</option>
+              <option value="6">F#4</option><option value="7">G4</option>
+              <option value="8">G#4</option><option value="9">A4</option>
+              <option value="10">A#4</option><option value="11">B4</option>
+              
+              <!-- Octave 5 -->
+              <option value="12">C5</option><option value="13">C#5</option>
+              <option value="14">D5</option><option value="15">D#5</option>
+              <option value="16">E5</option>
             </select>
           </div>
         </div>
@@ -234,7 +249,7 @@
 
     <!-- Recorder / STEM Export Bar -->
     <div class="row" style="margin-top:12px; justify-content:space-between; align-items: center; border-top: 2px solid rgba(56, 52, 46, 0.2); padding-top: 16px;">
-      <span id="sys-msg" class="val" style="background:transparent; border:none; color:#4af55d; text-shadow:none;">READY</span>
+      <span id="sys-msg" class="val" style="background:transparent; border:none; text-shadow:none;">READY</span>
       
       <div style="display:flex; gap:12px; align-items:center;">
         <span style="font-size:9px; color:var(--border-dark); font-weight:800; letter-spacing:1px;">STEM EXPORT:</span>
@@ -252,6 +267,6 @@
   <div class="wood-cheek wood-right"></div>
 </div>
 
-<script src="js/app.js?v=3"></script>
+<script src="js/app.js?v=4"></script>
 </body>
 </html>

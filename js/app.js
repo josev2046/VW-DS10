@@ -4,9 +4,10 @@ let synths = {}, lfo, lfoGain, patch = {};
 let initialized = false;
 let knobControls = {};
 
+// Tweaked for a darker, more serious analogue tone
 const params = {
-  syn1:{wave:'sawtooth',octave:0,tune:0,cutoff:0.45,reso:0.2,envAmt:0.6,attack:0.05,decay:0.3,sustain:0.2,release:0.1,level:0.8,legato:false},
-  syn2:{wave:'square',octave:1,tune:0,cutoff:0.6,reso:0.4,envAmt:0.5,attack:0.01,decay:0.2,sustain:0.1,release:0.2,level:0.5,legato:false},
+  syn1:{wave:'square',octave:0,tune:0,cutoff:0.35,reso:0.4,envAmt:0.5,attack:0.01,decay:0.25,sustain:0.1,release:0.1,level:0.8,legato:false},
+  syn2:{wave:'sawtooth',octave:1,tune:0,cutoff:0.4,reso:0.6,envAmt:0.6,attack:0.01,decay:0.4,sustain:0.1,release:0.3,level:0.6,legato:true},
   lfoRate:4, chorusRate:1.2, chorusDepth:0.5, delayTime:0.32, delayFb:0.35, delayMix:0.3,
   chorusOn:false, delayOn:false,
   patch:{'syn1-pitch':0,'syn1-cutoff':0,'syn2-pitch':0,'syn2-cutoff':0}
@@ -415,19 +416,21 @@ function mapDemoTrack(patt, track, arr, notesArr) {
     }
 }
 
-// Demo Pattern A (Groove)
+// Demo Pattern A (Dark Wave / Minimal Techno Groove)
 mapDemoTrack('A', 'kick',  [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0]);
 mapDemoTrack('A', 'snare', [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0]);
 mapDemoTrack('A', 'hihat', [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0]);
-mapDemoTrack('A', 'syn1',  [1,0,1,1, 0,1,0,1, 1,0,1,0, 0,1,0,0], [-12,0,-12,-12, 0,-5,0,-3, -12,0,-12,0, 0,-5,0,0]);
-mapDemoTrack('A', 'syn2',  [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], [0,0,12,0, 0,0,7,0, 0,0,12,0, 0,0,7,0]);
+mapDemoTrack('A', 'tom',   [0,0,0,0, 0,0,0,1, 0,0,0,0, 0,1,0,0]);
+mapDemoTrack('A', 'syn1',  [1,0,1,1, 0,1,0,0, 1,0,1,0, 0,1,0,0], [-12,0,-12,-12, 0,-12,0,0, -12,0,-12,0, 0,-5,0,0]);
+mapDemoTrack('A', 'syn2',  [0,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], [0,0,0,0, 0,0,-5,0, 0,0,0,0, 0,0,7,0]);
 
-// Demo Pattern B (Build)
+// Demo Pattern B (Tension / Drop)
 mapDemoTrack('B', 'kick',  [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0]);
-mapDemoTrack('B', 'snare', [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,1,1,1]);
-mapDemoTrack('B', 'hihat', [0,0,1,0, 0,0,1,0, 0,0,1,0, 1,1,1,1]);
-mapDemoTrack('B', 'syn1',  [1,0,1,1, 0,1,0,1, 1,0,1,0, 0,1,0,0], [-12,0,-12,-12, 0,-5,0,-3, -12,0,-12,0, 0,-5,0,0]);
-mapDemoTrack('B', 'syn2',  [0,0,1,0, 1,0,1,0, 0,0,1,0, 1,1,1,1], [0,0,12,0, 12,0,7,0, 0,0,12,0, 12,12,12,12]);
+mapDemoTrack('B', 'snare', [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,1,1,0]);
+mapDemoTrack('B', 'hihat', [1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1]);
+mapDemoTrack('B', 'tom',   [0,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,0]);
+mapDemoTrack('B', 'syn1',  [1,0,1,1, 0,1,0,0, 1,0,1,0, 0,1,0,0], [-12,0,-12,-12, 0,-12,0,0, -12,0,-12,0, 0,-5,0,0]);
+mapDemoTrack('B', 'syn2',  [0,0,1,0, 0,0,1,0, 0,0,1,0, 1,1,1,1], [0,0,7,0, 0,0,10,0, 0,0,12,0, 15,15,15,15]);
 
 let curTrack = 'syn1', curPattern = 'A';
 let playing=false, curStep=0, nextStepTime=0, timerId=null, activeSongPattern=null;
